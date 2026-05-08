@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
 import Modal from '../components/Modal';
+import Pagination from '../components/Pagination';
 import { RoleBadge, Avatar } from '../components/Badges';
 
 function UserForm({ onSave, onClose }) {
@@ -62,15 +63,21 @@ export default function UsersPage() {
   const [users, setUsers]     = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal]     = useState(false);
+  const [page, setPage]       = useState(1);
+  const [pagination, setPagination] = useState(null);
 
   const fetchUsers = async () => {
     setLoading(true);
-    try { const res = await api.get('/users'); setUsers(res.data); }
+    try { 
+      const res = await api.get('/users', { params: { page, limit: 20 } });
+      setUsers(res.data.data);
+      setPagination(res.data.pagination);
+    }
     catch { toast.error('Failed to load users'); }
     finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchUsers(); }, []);
+  useEffect(() => { fetchUsers(); }, [page]);
 
   const toggleActive = async (u) => {
     try {
@@ -142,6 +149,7 @@ export default function UsersPage() {
               ))}
             </tbody>
           </table>
+          {pagination && <Pagination pagination={pagination} onChange={setPage} />}
         )}
       </div>
 

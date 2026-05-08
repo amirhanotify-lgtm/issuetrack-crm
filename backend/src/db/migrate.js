@@ -39,6 +39,7 @@ CREATE TABLE clients (
   email       VARCHAR(150),
   company     VARCHAR(150),
   notes_count INT NOT NULL DEFAULT 0,
+  active      BOOLEAN NOT NULL DEFAULT true,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

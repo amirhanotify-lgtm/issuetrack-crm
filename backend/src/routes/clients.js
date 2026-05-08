@@ -10,13 +10,13 @@ router.get('/', authenticate, async (req, res) => {
   const { page, limit, offset } = paginate(req.query);
   const { q } = req.query;
   try {
-    const conditions = [];
+    const conditions = ['c.active = true'];
     const params = [];
     if (q) {
       params.push(`%${q}%`);
       conditions.push(`(c.name ILIKE $${params.length} OR c.phone ILIKE $${params.length} OR c.email ILIKE $${params.length})`);
     }
-    const where = conditions.length ? 'WHERE ' + conditions.join(' AND ') : '';
+    const where = 'WHERE ' + conditions.join(' AND ');
     const countRes = await pool.query(`SELECT COUNT(*) FROM clients c ${where}`, params);
     const dataRes  = await pool.query(
       `SELECT c.*, 
@@ -119,10 +119,13 @@ router.patch('/:id', authenticate, [
 // DELETE /api/clients/:id  (admin only)
 router.delete('/:id', authenticate, authorize('admin'), async (req, res) => {
   try {
-    const result = await pool.query('DELETE FROM clients WHERE id = $1 RETURNING *', [req.params.id]);
+    const result = await pool.query(
+      'UPDATE clients SET active = false WHERE id = $1 RETURNING *',
+      [req.params.id]
+    );
     if (!result.rows[0]) return res.status(404).json({ error: 'Client not found' });
     await logActivity(req.user.id, 'delete_client', 'client', req.params.id, result.rows[0].name);
-    res.json({ message: 'Client deleted' });
+    res.json({ message: 'Client deactivated' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

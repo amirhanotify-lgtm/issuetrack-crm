@@ -4,19 +4,23 @@ const { body, validationResult } = require('express-validator');
 const pool = require('../db/pool');
 const { authenticate, authorize } = require('../middleware/auth');
 const { logActivity } = require('../utils/logger');
+const { paginate, paginatedResponse } = require('../utils/pagination');
 
 // GET /api/users  (admin/supervisor)
 router.get('/', authenticate, authorize('admin', 'supervisor'), async (req, res) => {
+  const { page, limit, offset } = paginate(req.query);
   try {
-    const result = await pool.query(`
+    const countRes = await pool.query('SELECT COUNT(*) FROM users');
+    const dataRes = await pool.query(`
       SELECT u.id, u.name, u.email, u.role, u.active, u.created_at,
              COUNT(n.id)::int AS notes_count
       FROM users u
       LEFT JOIN notes n ON n.agent_id = u.id
       GROUP BY u.id
-      ORDER BY u.created_at
-    `);
-    res.json(result.rows);
+      ORDER BY u.created_at DESC
+      LIMIT $1 OFFSET $2
+    `, [limit, offset]);
+    res.json(paginatedResponse(dataRes.rows, countRes.rows[0].count, page, limit));
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

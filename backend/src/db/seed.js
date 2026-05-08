@@ -70,37 +70,33 @@ async function seed() {
 
     await client.query(`
       INSERT INTO notes (client_id, agent_id, category_id, title, description, priority, status, counter, created_at, updated_at) VALUES
-        ($1,$2,$3,'Package not delivered on time','Customer reports package marked as delivered but was not received at the address. Third occurrence this month.',                   'High',   'Open',        7, $11, $12),
-        ($4,$5,$6,'Payment failed at checkout',   'Card processing error during online checkout. Customer unable to complete purchase. Affects multiple payment methods.',          'High',   'In Progress', 12,$13, $14),
-        ($7,$2,$8,'Product arrived damaged',       'Packaging damage resulted in defective item on arrival. Customer requests replacement or full refund.',                         'Medium', 'Open',        5, $15, $16),
-        ($9,$10,$11,'App crashes on login screen', 'Mobile app (iOS 17) crashes immediately when user attempts to enter credentials. Cannot reproduce on Android.',                'High',   'In Progress', 9, $17, $18),
-        ($1,$2,$19,'Double charged for single order','Customer was charged twice for the same order #4421. Second charge appeared 2 hours after the first.',                       'High',   'Open',        3, $20, $21),
-        ($22,$5,$23,'Wrong item shipped',          'Customer ordered SKU-1042 (Blue, Large) but received SKU-1039 (Red, Small). Return label sent.',                               'Medium', 'Resolved',    4, $24, $25),
-        ($4,$2,$26,'Missing parts in package',     'Product manual references 6 components but only 4 were included. Missing: power adapter and mounting bracket.',               'Low',    'Resolved',    2, $27, $28),
-        ($7,$10,$29,'Password reset email not arriving','Reset email not received within expected timeframe. Checked spam folder. Issue affects users on @gmail.com domains.',    'Medium', 'Resolved',    6, $30, $31),
-        ($32,$2,$33,'Incorrect invoice amount',    'Invoice #INV-2204 shows $1,240 but contracted rate is $1,100. Discrepancy of $140 needs credit note.',                        'Medium', 'Open',        2, $34, $35),
-        ($36,$5,$8,'Subscription renewal failed',  'Annual subscription could not be auto-renewed. Card on file is valid. Manual renewal also failing.',                           'High',   'In Progress', 8, $37, $38)
+        ($1, $2, $3, 'Package not delivered on time', 'Customer reports package marked as delivered but was not received at the address. Third occurrence this month.', 'High', 'Open', 7, $4, $5),
+        ($6, $7, $8, 'Payment failed at checkout', 'Card processing error during online checkout. Customer unable to complete purchase. Affects multiple payment methods.', 'High', 'In Progress', 12, $9, $10),
+        ($11, $2, $12, 'Product arrived damaged', 'Packaging damage resulted in defective item on arrival. Customer requests replacement or full refund.', 'Medium', 'Open', 5, $13, $14),
+        ($15, $16, $17, 'App crashes on login screen', 'Mobile app (iOS 17) crashes immediately when user attempts to enter credentials. Cannot reproduce on Android.', 'High', 'In Progress', 9, $18, $19),
+        ($1, $2, $8, 'Double charged for single order', 'Customer was charged twice for the same order #4421. Second charge appeared 2 hours after the first.', 'High', 'Open', 3, $20, $21),
+        ($6, $7, $12, 'Wrong item shipped', 'Customer ordered SKU-1042 (Blue, Large) but received SKU-1039 (Red, Small). Return label sent.', 'Medium', 'Resolved', 4, $22, $23),
+        ($11, $2, $12, 'Missing parts in package', 'Product manual references 6 components but only 4 were included. Missing: power adapter and mounting bracket.', 'Low', 'Resolved', 2, $24, $25),
+        ($15, $16, $17, 'Password reset email not arriving', 'Reset email not received within expected timeframe. Checked spam folder. Issue affects users on @gmail.com domains.', 'Medium', 'Resolved', 6, $26, $27),
+        ($28, $29, $30, 'Incorrect invoice amount', 'Invoice #INV-2204 shows $1,240 but contracted rate is $1,100. Discrepancy of $140 needs credit note.', 'Medium', 'Open', 2, $31, $32),
+        ($33, $34, $35, 'Subscription renewal failed', 'Annual subscription could not be auto-renewed. Card on file is valid. Manual renewal also failing.', 'High', 'In Progress', 8, $36, $37)
     `, [
       clients[0].id, aisha.id, delivery.id,
-      clients[1].id, tom.id,   payment.id,
-      clients[2].id, aisha.id, productQ.id,
-      clients[3].id, lily.id,  tech.id,
-      payment.id,
-      clients[4].id, tom.id,   delivery.id,
-      clients[1].id, aisha.id, productQ.id,
-      clients[2].id, lily.id,  tech.id,
-      clients[5].id, aisha.id, billing.id,
-      clients[6].id, tom.id,   payment.id,
       daysAgo(10), daysAgo(2),
-      daysAgo(9),  daysAgo(3),
-      daysAgo(8),  daysAgo(4),
+      clients[1].id, tom.id, payment.id,
+      daysAgo(9), daysAgo(3),
+      clients[2].id, productQ.id,
+      daysAgo(8), daysAgo(4),
+      clients[3].id, lily.id, tech.id,
       daysAgo(15), daysAgo(5),
-      daysAgo(5),  daysAgo(1),
+      daysAgo(5), daysAgo(1),
       daysAgo(20), daysAgo(10),
       daysAgo(25), daysAgo(14),
       daysAgo(30), daysAgo(20),
-      daysAgo(4),  daysAgo(1),
-      daysAgo(7),  daysAgo(2),
+      clients[6].id, tom.id, billing.id,
+      daysAgo(4), daysAgo(1),
+      clients[7].id, aisha.id, payment.id,
+      daysAgo(7), daysAgo(2)
     ]);
     console.log('✓ Notes seeded');
 

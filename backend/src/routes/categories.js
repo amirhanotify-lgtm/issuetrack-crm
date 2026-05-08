@@ -4,6 +4,21 @@ const pool = require('../db/pool');
 const { authenticate, authorize } = require('../middleware/auth');
 const { logActivity } = require('../utils/logger');
 
+// Helper function to check for circular references
+async function hasCircularReference(categoryId, newParentId) {
+  if (!newParentId || categoryId === newParentId) return categoryId === newParentId;
+  let currentId = newParentId;
+  const visited = new Set();
+  while (currentId) {
+    if (visited.has(currentId)) return true; // Cycle detected
+    visited.add(currentId);
+    if (currentId === categoryId) return true; // Would point back to itself
+    const result = await pool.query('SELECT parent_id FROM categories WHERE id = $1', [currentId]);
+    currentId = result.rows[0]?.parent_id;
+  }
+  return false;
+}
+
 // GET /api/categories
 router.get('/', authenticate, async (req, res) => {
   try {
@@ -33,6 +48,7 @@ router.post('/', authenticate, authorize('admin'), [
 
   const { name, parent_id } = req.body;
   try {
+    // For new categories, no circular check needed since they have no children yet
     const result = await pool.query(
       'INSERT INTO categories (name, parent_id) VALUES ($1,$2) RETURNING *',
       [name, parent_id || null]
@@ -47,15 +63,25 @@ router.post('/', authenticate, authorize('admin'), [
 // PATCH /api/categories/:id  (admin)
 router.patch('/:id', authenticate, authorize('admin'), [
   body('name').optional().trim().notEmpty(),
+  body('parent_id').optional({ checkFalsy: true }).isInt(),
 ], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
   const { name, parent_id } = req.body;
+  const categoryId = parseInt(req.params.id);
   try {
+    // Check for circular reference
+    if (parent_id !== undefined && await hasCircularReference(categoryId, parent_id)) {
+      return res.status(400).json({ error: 'Circular reference detected in category hierarchy' });
+    }
+
     const result = await pool.query(
       `UPDATE categories SET
          name = COALESCE($1, name),
-         parent_id = COALESCE($2, parent_id)
+         parent_id = $2
        WHERE id = $3 RETURNING *`,
-      [name || null, parent_id || null, req.params.id]
+      [name || null, parent_id !== undefined ? parent_id : null, categoryId]
     );
     if (!result.rows[0]) return res.status(404).json({ error: 'Category not found' });
     res.json(result.rows[0]);
