@@ -104,52 +104,54 @@ export default function UsersPage() {
 
       <div className="card">
         {loading ? <div className="loading-page"><div className="spinner" /></div> : (
-          <table>
-            <thead>
-              <tr><th>User</th><th>Email</th><th>Role</th><th>Notes</th><th>Status</th><th>Joined</th><th>Actions</th></tr>
-            </thead>
-            <tbody>
-              {users.map(u => (
-                <tr key={u.id}>
-                  <td>
-                    <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                      <Avatar name={u.name} size={30} color={u.active ? 'var(--accent)' : 'var(--border2)'} />
-                      <span className="bold">{u.name}</span>
-                    </div>
-                  </td>
-                  <td className="text-mono" style={{ fontSize:12 }}>{u.email}</td>
-                  <td>
-                    <select
-                      className="filter-select" style={{ padding:'3px 8px', fontSize:11 }}
-                      value={u.role} onChange={e => changeRole(u, e.target.value)}
-                    >
-                      <option value="agent">Agent</option>
-                      <option value="supervisor">Supervisor</option>
-                      <option value="admin">Admin</option>
-                    </select>
-                  </td>
-                  <td style={{ color:'var(--accent)' }}>{u.notes_count}</td>
-                  <td>
-                    <span className={`badge ${u.active ? 'badge-resolved' : 'badge-high'}`}>
-                      {u.active ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td className="text-dim" style={{ fontSize:12 }}>
-                    {new Date(u.created_at).toLocaleDateString()}
-                  </td>
-                  <td>
-                    <button
-                      className={`btn btn-sm ${u.active ? 'btn-danger' : 'btn-success'}`}
-                      onClick={() => toggleActive(u)}
-                    >
-                      {u.active ? 'Deactivate' : 'Activate'}
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {pagination && <Pagination pagination={pagination} onChange={setPage} />}
+          <>
+            <table>
+              <thead>
+                <tr><th>User</th><th>Email</th><th>Role</th><th>Notes</th><th>Status</th><th>Joined</th><th>Actions</th></tr>
+              </thead>
+              <tbody>
+                {users.map(u => (
+                  <tr key={u.id}>
+                    <td>
+                      <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                        <Avatar name={u.name} size={30} color={u.active ? 'var(--accent)' : 'var(--border2)'} />
+                        <span className="bold">{u.name}</span>
+                      </div>
+                    </td>
+                    <td className="text-mono" style={{ fontSize:12 }}>{u.email}</td>
+                    <td>
+                      <select
+                        className="filter-select" style={{ padding:'3px 8px', fontSize:11 }}
+                        value={u.role} onChange={e => changeRole(u, e.target.value)}
+                      >
+                        <option value="agent">Agent</option>
+                        <option value="supervisor">Supervisor</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                    </td>
+                    <td style={{ color:'var(--accent)' }}>{u.notes_count}</td>
+                    <td>
+                      <span className={`badge ${u.active ? 'badge-resolved' : 'badge-high'}`}>
+                        {u.active ? 'Active' : 'Inactive'}
+                      </span>
+                    </td>
+                    <td className="text-dim" style={{ fontSize:12 }}>
+                      {new Date(u.created_at).toLocaleDateString()}
+                    </td>
+                    <td>
+                      <button
+                        className={`btn btn-sm ${u.active ? 'btn-danger' : 'btn-success'}`}
+                        onClick={() => toggleActive(u)}
+                      >
+                        {u.active ? 'Deactivate' : 'Activate'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {pagination && <Pagination pagination={pagination} onChange={setPage} />}
+          </>
         )}
       </div>
 
