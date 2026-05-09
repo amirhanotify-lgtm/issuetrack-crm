@@ -68,6 +68,13 @@ export default function LoginPage() {
 
         <div style={{ marginTop: 20, paddingTop: 16, borderTop: '1px solid var(--border)' }}>
           <p style={{ fontSize: 11, color: 'var(--text3)', textAlign: 'center', marginBottom: 10 }}>
+            NEW USER?{' '}
+            <button className="btn btn-link" onClick={() => navigate('/signup')}
+              style={{ padding: 0, color: 'var(--accent)', textDecoration: 'underline', cursor: 'pointer' }}>
+              Sign up here
+            </button>
+          </p>
+          <p style={{ fontSize: 11, color: 'var(--text3)', textAlign: 'center', marginBottom: 10, paddingTop: 10, borderTop: '1px solid var(--border)', marginTop: 10 }}>
             DEMO QUICK LOGIN
           </p>
           <div style={{ display: 'flex', gap: 6 }}>

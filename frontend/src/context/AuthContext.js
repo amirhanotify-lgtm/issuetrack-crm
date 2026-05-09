@@ -18,6 +18,18 @@ export function AuthProvider({ children }) {
     return user;
   };
 
+  const signup = async (name, email, password, token = null) => {
+    const payload = { name, email, password };
+    if (token) payload.token = token;
+    
+    const res = await api.post('/auth/signup', payload);
+    const { token: jwtToken, user } = res.data;
+    localStorage.setItem('crm_token', jwtToken);
+    localStorage.setItem('crm_user', JSON.stringify(user));
+    setUser(user);
+    return user;
+  };
+
   const logout = () => {
     localStorage.removeItem('crm_token');
     localStorage.removeItem('crm_user');
@@ -27,7 +39,7 @@ export function AuthProvider({ children }) {
   const can = (...roles) => user && roles.includes(user.role);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, can, loading }}>
+    <AuthContext.Provider value={{ user, login, signup, logout, can, loading }}>
       {children}
     </AuthContext.Provider>
   );

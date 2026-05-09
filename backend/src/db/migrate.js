@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS activity_logs CASCADE;
 DROP TABLE IF EXISTS notes CASCADE;
 DROP TABLE IF EXISTS categories CASCADE;
 DROP TABLE IF EXISTS clients CASCADE;
+DROP TABLE IF EXISTS invitations CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
 
 -- ============================================================
@@ -28,6 +29,25 @@ CREATE TABLE users (
 
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_role  ON users(role);
+
+-- ============================================================
+-- INVITATIONS
+-- ============================================================
+CREATE TABLE invitations (
+  id          SERIAL PRIMARY KEY,
+  email       VARCHAR(150) NOT NULL,
+  role        VARCHAR(20) NOT NULL
+                CHECK (role IN ('admin', 'supervisor', 'agent')),
+  token       VARCHAR(255) UNIQUE NOT NULL,
+  created_by  INT REFERENCES users(id) ON DELETE SET NULL,
+  used_at     TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  expires_at  TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '7 days')
+);
+
+CREATE INDEX idx_invitations_email ON invitations(email);
+CREATE INDEX idx_invitations_token ON invitations(token);
+CREATE INDEX idx_invitations_created_at ON invitations(created_at);
 
 -- ============================================================
 -- CLIENTS

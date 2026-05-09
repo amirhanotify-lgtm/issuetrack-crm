@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
+import SignUpPage from './pages/SignUpPage';
 import DashboardPage from './pages/DashboardPage';
 import ClientsPage from './pages/ClientsPage';
 import NotesPage from './pages/NotesPage';
@@ -12,6 +13,7 @@ import ReportsPage from './pages/ReportsPage';
 import ActivityPage from './pages/ActivityPage';
 import UsersPage from './pages/UsersPage';
 import CategoriesPage from './pages/CategoriesPage';
+import InviteUsersPage from './pages/InviteUsersPage';
 
 function PrivateRoute({ children, roles }) {
   const { user } = useAuth();
@@ -25,6 +27,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" replace /> : <LoginPage />} />
+      <Route path="/signup" element={user ? <Navigate to="/" replace /> : <SignUpPage />} />
       <Route path="/" element={<PrivateRoute><Layout /></PrivateRoute>}>
         <Route index element={<DashboardPage />} />
         <Route path="clients" element={<ClientsPage />} />
@@ -33,6 +36,7 @@ function AppRoutes() {
         <Route path="activity" element={<ActivityPage />} />
         <Route path="users" element={<PrivateRoute roles={['admin']}><UsersPage /></PrivateRoute>} />
         <Route path="categories" element={<PrivateRoute roles={['admin']}><CategoriesPage /></PrivateRoute>} />
+        <Route path="invite-users" element={<PrivateRoute roles={['admin']}><InviteUsersPage /></PrivateRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
