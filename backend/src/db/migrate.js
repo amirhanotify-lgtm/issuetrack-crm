@@ -4,18 +4,10 @@ const schema = `
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- Drop tables in reverse dependency order
-DROP TABLE IF EXISTS activity_logs CASCADE;
-DROP TABLE IF EXISTS notes CASCADE;
-DROP TABLE IF EXISTS categories CASCADE;
-DROP TABLE IF EXISTS clients CASCADE;
-DROP TABLE IF EXISTS invitations CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-
 -- ============================================================
 -- USERS
 -- ============================================================
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
   id          SERIAL PRIMARY KEY,
   name        VARCHAR(100) NOT NULL,
   email       VARCHAR(150) UNIQUE NOT NULL,
@@ -27,13 +19,13 @@ CREATE TABLE users (
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_users_role  ON users(role);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_role  ON users(role);
 
 -- ============================================================
 -- INVITATIONS
 -- ============================================================
-CREATE TABLE invitations (
+CREATE TABLE IF NOT EXISTS invitations (
   id          SERIAL PRIMARY KEY,
   email       VARCHAR(150) NOT NULL,
   role        VARCHAR(20) NOT NULL
@@ -45,14 +37,14 @@ CREATE TABLE invitations (
   expires_at  TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '7 days')
 );
 
-CREATE INDEX idx_invitations_email ON invitations(email);
-CREATE INDEX idx_invitations_token ON invitations(token);
-CREATE INDEX idx_invitations_created_at ON invitations(created_at);
+CREATE INDEX IF NOT EXISTS idx_invitations_email ON invitations(email);
+CREATE INDEX IF NOT EXISTS idx_invitations_token ON invitations(token);
+CREATE INDEX IF NOT EXISTS idx_invitations_created_at ON invitations(created_at);
 
 -- ============================================================
 -- CLIENTS
 -- ============================================================
-CREATE TABLE clients (
+CREATE TABLE IF NOT EXISTS clients (
   id          SERIAL PRIMARY KEY,
   name        VARCHAR(150) NOT NULL,
   phone       VARCHAR(30)  UNIQUE NOT NULL,
@@ -64,25 +56,25 @@ CREATE TABLE clients (
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_clients_phone ON clients(phone);
-CREATE INDEX idx_clients_name  ON clients(name);
+CREATE INDEX IF NOT EXISTS idx_clients_phone ON clients(phone);
+CREATE INDEX IF NOT EXISTS idx_clients_name  ON clients(name);
 
 -- ============================================================
 -- CATEGORIES
 -- ============================================================
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
   id          SERIAL PRIMARY KEY,
   name        VARCHAR(100) NOT NULL,
   parent_id   INT REFERENCES categories(id) ON DELETE SET NULL,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_categories_parent ON categories(parent_id);
+CREATE INDEX IF NOT EXISTS idx_categories_parent ON categories(parent_id);
 
 -- ============================================================
 -- NOTES / ISSUES
 -- ============================================================
-CREATE TABLE notes (
+CREATE TABLE IF NOT EXISTS notes (
   id           SERIAL PRIMARY KEY,
   client_id    INT NOT NULL REFERENCES clients(id) ON DELETE CASCADE,
   agent_id     INT NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
@@ -99,18 +91,18 @@ CREATE TABLE notes (
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_notes_client_id   ON notes(client_id);
-CREATE INDEX idx_notes_agent_id    ON notes(agent_id);
-CREATE INDEX idx_notes_category_id ON notes(category_id);
-CREATE INDEX idx_notes_status      ON notes(status);
-CREATE INDEX idx_notes_priority    ON notes(priority);
-CREATE INDEX idx_notes_title       ON notes USING gin(to_tsvector('english', title));
-CREATE INDEX idx_notes_created_at  ON notes(created_at);
+CREATE INDEX IF NOT EXISTS idx_notes_client_id   ON notes(client_id);
+CREATE INDEX IF NOT EXISTS idx_notes_agent_id    ON notes(agent_id);
+CREATE INDEX IF NOT EXISTS idx_notes_category_id ON notes(category_id);
+CREATE INDEX IF NOT EXISTS idx_notes_status      ON notes(status);
+CREATE INDEX IF NOT EXISTS idx_notes_priority    ON notes(priority);
+CREATE INDEX IF NOT EXISTS idx_notes_title       ON notes USING gin(to_tsvector('english', title));
+CREATE INDEX IF NOT EXISTS idx_notes_created_at  ON notes(created_at);
 
 -- ============================================================
 -- ACTIVITY LOGS
 -- ============================================================
-CREATE TABLE activity_logs (
+CREATE TABLE IF NOT EXISTS activity_logs (
   id          SERIAL PRIMARY KEY,
   user_id     INT REFERENCES users(id) ON DELETE SET NULL,
   action      VARCHAR(100) NOT NULL,
@@ -121,9 +113,9 @@ CREATE TABLE activity_logs (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_activity_user_id    ON activity_logs(user_id);
-CREATE INDEX idx_activity_created_at ON activity_logs(created_at);
-CREATE INDEX idx_activity_action     ON activity_logs(action);
+CREATE INDEX IF NOT EXISTS idx_activity_user_id    ON activity_logs(user_id);
+CREATE INDEX IF NOT EXISTS idx_activity_created_at ON activity_logs(created_at);
+CREATE INDEX IF NOT EXISTS idx_activity_action     ON activity_logs(action);
 
 -- ============================================================
 -- AUTO-UPDATE updated_at TRIGGER
