@@ -160,6 +160,17 @@ router.get('/me', authenticate, async (req, res) => {
   res.json(req.user);
 });
 
+// GET /api/auth/setup - Determine whether public signup is allowed
+router.get('/setup', async (req, res) => {
+  try {
+    const result = await pool.query("SELECT COUNT(*) FROM users WHERE role = 'admin'");
+    const adminsExist = Number(result.rows[0].count) > 0;
+    res.json({ adminsExist });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ============================================================
 // ADMIN ENDPOINTS - INVITATIONS
 // ============================================================

@@ -5,14 +5,14 @@ import api from '../utils/api';
 import toast from 'react-hot-toast';
 
 export default function SignUpPage() {
-  const { login } = useAuth();
+  const { signup } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
 
   const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [loading, setLoading] = useState(false);
-  const [mode, setMode] = useState('loading'); // 'loading', 'firstAdmin', 'invited'
+  const [mode, setMode] = useState('loading'); // 'loading', 'firstAdmin', 'invited', 'inviteRequired'
   const [invitationData, setInvitationData] = useState(null);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -32,21 +32,27 @@ export default function SignUpPage() {
             toast.error('Invalid or expired invitation');
             setMode('error');
           }
-        } else {
-          // Check if any admins exist
+          return;
+        }
+
+        const storedToken = localStorage.getItem('crm_token');
+        if (storedToken) {
           try {
-            const res = await api.get('/auth/me').catch(() => null);
-            if (res) {
-              // User is already logged in
+            const res = await api.get('/auth/me');
+            if (res?.data) {
               navigate('/');
-            } else {
-              // No admins exist yet, this is first signup
-              setMode('firstAdmin');
+              return;
             }
           } catch {
-            // No user logged in, allow first admin signup
-            setMode('firstAdmin');
+            // Invalid token or not logged in, allow signup logic below
           }
+        }
+
+        const setupRes = await api.get('/auth/setup');
+        if (setupRes.data.adminsExist) {
+          setMode('inviteRequired');
+        } else {
+          setMode('firstAdmin');
         }
       } catch (err) {
         toast.error('Failed to load signup form');
@@ -72,26 +78,7 @@ export default function SignUpPage() {
 
     setLoading(true);
     try {
-      const payload = {
-        name: form.name,
-        email: form.email,
-        password: form.password,
-      };
-
-      if (token) {
-        payload.token = token;
-      }
-
-      const res = await api.post('/auth/signup', payload);
-      const { token: jwtToken, user } = res.data;
-
-      // Store token and user
-      localStorage.setItem('crm_token', jwtToken);
-      localStorage.setItem('crm_user', JSON.stringify(user));
-
-      // Update auth context
-      await login(user.email, form.password);
-
+      await signup(form.name, form.email, form.password, token || null);
       toast.success('Account created successfully!');
       navigate('/');
     } catch (err) {
@@ -111,6 +98,28 @@ export default function SignUpPage() {
         <div style={{ textAlign: 'center' }}>
           <span className="spinner" style={{ marginBottom: 16, display: 'block' }} />
           <p style={{ color: 'var(--text2)' }}>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === 'inviteRequired') {
+    return (
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        minHeight: '100vh', background: 'var(--bg)',
+      }}>
+        <div style={{
+          background: 'var(--bg2)', border: '1px solid var(--border2)',
+          borderRadius: 14, padding: 40, width: 420, textAlign: 'center',
+        }}>
+          <h2 style={{ color: 'var(--text1)', marginBottom: 16 }}>Signup by Invitation Only</h2>
+          <p style={{ color: 'var(--text2)', marginBottom: 20 }}>
+            An admin already exists for this organization. To create a new account, please accept an invitation email or ask an admin to invite you.
+          </p>
+          <button className="btn btn-primary" onClick={() => navigate('/login')}>
+            Back to Login
+          </button>
         </div>
       </div>
     );
