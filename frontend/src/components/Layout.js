@@ -133,7 +133,6 @@ export default function Layout() {
         <header className="topbar">
           <div className="topbar-title" id="topbar-title">Dashboard</div>
           <div className="search-bar">
-            <IconSearch />
             <input
               placeholder="Search notes… (Enter)"
               value={search}
