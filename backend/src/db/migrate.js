@@ -128,15 +128,15 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_users_updated_at
+CREATE TRIGGER IF NOT EXISTS trg_users_updated_at
   BEFORE UPDATE ON users
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
-CREATE TRIGGER trg_clients_updated_at
+CREATE TRIGGER IF NOT EXISTS trg_clients_updated_at
   BEFORE UPDATE ON clients
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
-CREATE TRIGGER trg_notes_updated_at
+CREATE TRIGGER IF NOT EXISTS trg_notes_updated_at
   BEFORE UPDATE ON notes
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
@@ -155,7 +155,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_notes_count
+CREATE TRIGGER IF NOT EXISTS trg_notes_count
   AFTER INSERT OR DELETE ON notes
   FOR EACH ROW EXECUTE FUNCTION sync_client_notes_count();
 `;
