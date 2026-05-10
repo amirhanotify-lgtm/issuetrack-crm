@@ -24,8 +24,6 @@ export default function LoginPage() {
     }
   };
 
-  const quickLogin = (email) => setForm(f => ({ ...f, email }));
-
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -73,25 +71,6 @@ export default function LoginPage() {
               style={{ padding: 0, color: 'var(--accent)', textDecoration: 'underline', cursor: 'pointer' }}>
               Sign up here
             </button>
-          </p>
-          <p style={{ fontSize: 11, color: 'var(--text3)', textAlign: 'center', marginBottom: 10, paddingTop: 10, borderTop: '1px solid var(--border)', marginTop: 10 }}>
-            DEMO QUICK LOGIN
-          </p>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {[
-              { label: 'Admin', email: 'sarah@company.com' },
-              { label: 'Supervisor', email: 'marcus@company.com' },
-              { label: 'Agent', email: 'aisha@company.com' },
-            ].map(({ label, email }) => (
-              <button key={label} className="btn btn-ghost btn-sm"
-                style={{ flex: 1, justifyContent: 'center' }}
-                type="button" onClick={() => quickLogin(email)}>
-                {label}
-              </button>
-            ))}
-          </div>
-          <p style={{ fontSize: 11, color: 'var(--text3)', textAlign: 'center', marginTop: 8 }}>
-            Password for all: <code style={{ color: 'var(--accent)' }}>password123</code>
           </p>
         </div>
       </div>
