@@ -21,13 +21,14 @@ const allowedOrigins = [
   (process.env.FRONTEND_URL || '').replace(/\/$/, ''),
   'http://localhost:3000',
 ].filter(Boolean);
+const allowAllOrigins = allowedOrigins.length === 0;
 
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
     const clean = origin.replace(/\/$/, '');
-    if (allowedOrigins.includes(clean)) {
+    if (allowAllOrigins || allowedOrigins.includes(clean)) {
       callback(null, true);
     } else {
       callback(new Error(`CORS blocked: ${origin}`));
@@ -35,6 +36,10 @@ app.use(cors({
   },
   credentials: true,
 }));
+
+if (allowAllOrigins) {
+  console.warn('CORS: no FRONTEND_URL set, allowing all origins. Set FRONTEND_URL in production for better security.');
+}
 
 // ── Rate limiting ────────────────────────────────────────────
 app.use('/api/auth', rateLimit({
