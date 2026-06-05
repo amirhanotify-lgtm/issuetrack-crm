@@ -1,13 +1,13 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// Railway provides DATABASE_URL automatically — use it if available,
-// otherwise fall back to individual env vars for local development.
+// Use DATABASE_URL when provided (Render, Railway, Heroku, etc.).
+// Remote hosts typically require SSL — enable it for connectionString.
 const pool = new Pool(
   process.env.DATABASE_URL
     ? {
         connectionString: process.env.DATABASE_URL,
-        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+        ssl: { rejectUnauthorized: false },
         max: 20,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,
