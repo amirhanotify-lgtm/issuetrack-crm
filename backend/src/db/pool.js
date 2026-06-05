@@ -1,8 +1,8 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// Use DATABASE_URL when provided (Render, Railway, Heroku, etc.).
-// Remote hosts typically require SSL — enable it for connectionString.
+// Use DATABASE_URL when provided (Render, Heroku, or other managed hosts).
+// Remote hosts typically require SSL — enable it for the connection string.
 const pool = new Pool(
   process.env.DATABASE_URL
     ? {
