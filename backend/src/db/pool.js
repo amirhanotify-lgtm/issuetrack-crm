@@ -1,12 +1,16 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-// Use DATABASE_URL when provided (Render, Heroku, or other managed hosts).
-// Remote hosts typically require SSL — enable it for the connection string.
+// Use managed service connection string when provided (Railway, Render, Heroku).
+// Some hosts provide `DATABASE_URL` or `RAILWAY_DATABASE_URL` — accept both.
+const connectionString = process.env.DATABASE_URL || process.env.RAILWAY_DATABASE_URL || null;
+
 const pool = new Pool(
-  process.env.DATABASE_URL
+  connectionString
     ? {
-        connectionString: process.env.DATABASE_URL,
+        connectionString,
+        // Allow connections to managed Postgres that require SSL without
+        // strict certificate validation (common for platform-managed DBs).
         ssl: { rejectUnauthorized: false },
         max: 20,
         idleTimeoutMillis: 30000,
@@ -17,7 +21,7 @@ const pool = new Pool(
         port: process.env.DB_PORT || 5432,
         database: process.env.DB_NAME || 'issuetrack_crm',
         user: process.env.DB_USER || 'postgres',
-        password: process.env.DB_PASSWORD,
+        password: process.env.DB_PASSWORD || null,
         max: 20,
         idleTimeoutMillis: 30000,
         connectionTimeoutMillis: 2000,

@@ -198,6 +198,21 @@ npm start
 ```
 
 ### GET /api/clients
+
+---
+
+## Deploying to Railway
+
+If you host the backend and Postgres on Railway, set the provided database connection string in your Railway service environment variables as `DATABASE_URL` (or `RAILWAY_DATABASE_URL`). The backend accepts either variable and will enable SSL for managed Postgres automatically.
+
+Steps:
+
+1. Create a new Railway project and add a PostgreSQL plugin.
+2. In your Railway service's Environment, add `DATABASE_URL` with the connection string Railway provides.
+3. Add other required env vars: `JWT_SECRET`, `JWT_EXPIRES_IN`, `FRONTEND_URL`, `GMAIL_USER`, `GMAIL_PASSWORD` as needed.
+4. Deploy the backend; the repository's `postinstall` script will run migrations and seed demo data on first deploy.
+
+If Railway exposes a different variable name, `RAILWAY_DATABASE_URL` is also supported by the code.
 ```
 ?q=search+term&page=1&limit=20
 ```
