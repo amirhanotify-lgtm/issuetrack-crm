@@ -141,6 +141,13 @@ npm start
 | Agent      | aisha@company.com      | password123 |
 | Agent      | tom@company.com        | password123 |
 
+Use these credentials after the database has been seeded. If the tables are empty, run the release command or the migration/seed script first:
+
+```bash
+cd backend
+npm run db:reset
+```
+
 ---
 
 ## API Reference
