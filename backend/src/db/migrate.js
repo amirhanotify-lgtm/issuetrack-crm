@@ -1,9 +1,6 @@
 const pool = require('./pool');
 
 const schema = `
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-
 -- ============================================================
 -- USERS
 -- ============================================================
