@@ -89,12 +89,28 @@ app.use((err, req, res, _next) => {
   });
 });
 
-// ── Start ────────────────────────────────────────────────────
+const migrate = require('./db/migrate');
+
+// ── Start ───────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`\n🚀 IssueTrack CRM API running on port ${PORT}`);
-  console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`   Health:      http://localhost:${PORT}/health\n`);
+
+async function startServer() {
+  if (process.env.NODE_ENV !== 'test') {
+    console.log('Starting backend...');
+  }
+
+  await migrate();
+
+  app.listen(PORT, () => {
+    console.log(`\n🚀 IssueTrack CRM API running on port ${PORT}`);
+    console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`   Health:      http://localhost:${PORT}/health\n`);
+  });
+}
+
+startServer().catch((err) => {
+  console.error('Failed to start server:', err.message);
+  process.exit(1);
 });
 
 module.exports = app;

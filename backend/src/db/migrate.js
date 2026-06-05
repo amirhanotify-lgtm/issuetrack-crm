@@ -165,11 +165,18 @@ async function migrate() {
     console.log('✓ Schema created successfully');
   } catch (err) {
     console.error('Migration failed:', err.message);
-    process.exit(1);
+    throw err;
   } finally {
     client.release();
     await pool.end();
   }
 }
 
-migrate();
+if (require.main === module) {
+  migrate().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}
+
+module.exports = migrate;
