@@ -8,6 +8,9 @@ const { authenticate, authorize } = require('../middleware/auth');
 const { logActivity } = require('../utils/logger');
 const { sendInvitationEmail } = require('../utils/email');
 
+const jwtSecret = process.env.JWT_SECRET || process.env.jwt_secret || '';
+const jwtExpiresIn = process.env.JWT_EXPIRES_IN || process.env.jwt_expires_in || '7d';
+
 // ============================================================
 // PUBLIC ENDPOINTS
 // ============================================================
@@ -82,8 +85,8 @@ router.post('/signup', [
     await client.query('COMMIT');
 
     // Generate JWT token
-    const jwtToken = jwt.sign({ id: newUser.id, role: newUser.role }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    const jwtToken = jwt.sign({ id: newUser.id, role: newUser.role }, jwtSecret, {
+      expiresIn: jwtExpiresIn,
     });
 
     res.status(201).json({
@@ -138,8 +141,8 @@ router.post('/login', [
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    const token = jwt.sign({ id: user.id, role: user.role }, jwtSecret, {
+      expiresIn: jwtExpiresIn,
     });
     await logActivity(user.id, 'login', 'user', user.id, user.name);
     res.json({

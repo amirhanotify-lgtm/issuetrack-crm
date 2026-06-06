@@ -1,6 +1,8 @@
 const jwt = require('jsonwebtoken');
 const pool = require('../db/pool');
 
+const jwtSecret = process.env.JWT_SECRET || process.env.jwt_secret || '';
+
 const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -8,7 +10,7 @@ const authenticate = async (req, res, next) => {
   }
   const token = authHeader.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, jwtSecret);
     const result = await pool.query(
       'SELECT id, name, email, role, active FROM users WHERE id = $1',
       [decoded.id]

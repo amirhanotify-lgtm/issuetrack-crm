@@ -1,6 +1,9 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
+const frontendUrl = process.env.FRONTEND_URL || process.env.frontend_url || '';
+const nodeEnv = process.env.NODE_ENV || process.env.node_env || 'development';
+
 // Configure Gmail SMTP
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -14,7 +17,7 @@ const transporter = nodemailer.createTransport({
 transporter.verify((error, success) => {
   if (error) {
     console.error('Email service error:', error);
-  } else if (success && process.env.NODE_ENV !== 'test') {
+  } else if (success && nodeEnv !== 'test') {
     console.log('✓ Email service ready');
   }
 });
@@ -24,7 +27,7 @@ transporter.verify((error, success) => {
  */
 async function sendInvitationEmail(toEmail, invitationToken, invitedByName) {
   try {
-    const signupUrl = `${process.env.FRONTEND_URL}/signup?token=${invitationToken}`;
+    const signupUrl = `${frontendUrl}/signup?token=${invitationToken}`;
     
     const mailOptions = {
       from: process.env.GMAIL_USER,

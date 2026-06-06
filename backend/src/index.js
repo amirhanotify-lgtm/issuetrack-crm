@@ -17,8 +17,11 @@ const app = express();
 
 // ── Security ────────────────────────────────────────────────
 app.use(helmet());
+const frontendUrl = process.env.FRONTEND_URL || process.env.frontend_url || '';
+const nodeEnv = process.env.NODE_ENV || process.env.node_env || 'development';
+
 const allowedOrigins = [
-  (process.env.FRONTEND_URL || '').replace(/\/$/, ''),
+  frontendUrl.replace(/\/$/, ''),
   'http://localhost:3000',
 ].filter(Boolean);
 const allowAllOrigins = allowedOrigins.length === 0;
@@ -58,7 +61,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // ── Logging ──────────────────────────────────────────────────
-if (process.env.NODE_ENV !== 'test') {
+if (nodeEnv !== 'test') {
   app.use(morgan('dev'));
 }
 
@@ -85,7 +88,7 @@ app.use((req, res) => {
 app.use((err, req, res, _next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({
-    error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message,
+    error: nodeEnv === 'production' ? 'Internal server error' : err.message,
   });
 });
 
@@ -95,7 +98,7 @@ const migrate = require('./db/migrate');
 const PORT = process.env.PORT || 5000;
 
 async function startServer() {
-  if (process.env.NODE_ENV !== 'test') {
+  if (nodeEnv !== 'test') {
     console.log('Starting backend...');
   }
 
@@ -103,7 +106,7 @@ async function startServer() {
 
   app.listen(PORT, () => {
     console.log(`\n🚀 IssueTrack CRM API running on port ${PORT}`);
-    console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`   Environment: ${nodeEnv}`);
     console.log(`   Health:      http://localhost:${PORT}/health\n`);
   });
 }

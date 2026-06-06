@@ -3,7 +3,11 @@ require('dotenv').config();
 
 // Use managed service connection string when provided (Railway, Render, Heroku).
 // Some hosts provide `DATABASE_URL` or `RAILWAY_DATABASE_URL` — accept both.
-const connectionString = process.env.DATABASE_URL || process.env.RAILWAY_DATABASE_URL || null;
+const connectionString = process.env.DATABASE_URL
+  || process.env.RAILWAY_DATABASE_URL
+  || process.env.database_url
+  || process.env.railway_database_url
+  || null;
 
 const pool = new Pool(
   connectionString

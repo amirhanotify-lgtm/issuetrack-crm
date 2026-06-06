@@ -217,18 +217,18 @@ Steps:
 1. Create a new Railway project and add a PostgreSQL plugin.
 2. In your Railway service's Environment, add `DATABASE_URL` with the connection string Railway provides.
 3. Add other required env vars: `JWT_SECRET`, `JWT_EXPIRES_IN`, `FRONTEND_URL`, `GMAIL_USER`, `GMAIL_PASSWORD` as needed.
-4. Deploy the backend. The repository no longer runs migrations during `npm install` to avoid build-time DB connection errors.
+4. In Railway, set the service Start Command to `npm start` and the Release Command to `npm run release`.
+5. Deploy the backend. The release command runs migrations once the DB is reachable, and the app still performs a startup migration check as a safety net.
 
-Running migrations and seed on Railway:
+Running seed data on Railway (optional):
 
-- Use Railway's "Run" (one-off) command to execute migration and seed manually after the service starts:
+- If you want demo data as well, run this once in Railway's "Run" tab or shell:
 
 ```bash
-# From your repo/locally with Railway CLI configured, or via Railway web console
-railway run "node src/db/migrate.js && node src/db/seed.js"
+npm run release:seed
 ```
 
-- Alternatively, run the same command in your deployed service's web shell or configure a release hook that runs the migration once the DB is reachable.
+- You can also run the same command locally with `npm run release:seed`.
 
 This avoids build-time attempts to connect to `localhost:5432` during `npm install`.
 
