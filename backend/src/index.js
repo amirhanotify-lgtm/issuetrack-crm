@@ -107,7 +107,11 @@ async function startServer() {
 
   if (process.env.SEED_DEMO_DATA === 'true') {
     console.log('SEED_DEMO_DATA=true: seeding demo users...');
-    await seed();
+    try {
+      await seed();
+    } catch (err) {
+      console.error('Demo seed skipped because startup seeding failed:', err.message);
+    }
   }
 
   app.listen(PORT, () => {

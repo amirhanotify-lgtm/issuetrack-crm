@@ -4,6 +4,12 @@ const bcrypt = require('bcryptjs');
 async function seed() {
   const client = await pool.connect();
   try {
+    const existingUsers = await client.query('SELECT COUNT(*) FROM users');
+    if (Number(existingUsers.rows[0].count) > 0) {
+      console.log('Demo data already exists; skipping seed.');
+      return;
+    }
+
     console.log('Seeding database...');
     await client.query('BEGIN');
 
@@ -121,14 +127,23 @@ async function seed() {
     console.log('  Supervisor: marcus@company.com / password123');
     console.log('  Agent:      aisha@company.com  / password123');
   } catch (err) {
-    await client.query('ROLLBACK');
+    try {
+      await client.query('ROLLBACK');
+    } catch (_) {}
     console.error('Seeding failed:', err.message);
     console.error(err.stack);
-    process.exit(1);
+    throw err;
   } finally {
     client.release();
     await pool.end();
   }
 }
 
-seed();
+if (require.main === module) {
+  seed().catch((err) => {
+    console.error('Seed command failed:', err.message);
+    process.exit(1);
+  });
+}
+
+module.exports = seed;
