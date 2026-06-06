@@ -93,6 +93,7 @@ app.use((err, req, res, _next) => {
 });
 
 const migrate = require('./db/migrate');
+const seed = require('./db/seed');
 
 // ── Start ───────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
@@ -103,6 +104,11 @@ async function startServer() {
   }
 
   await migrate();
+
+  if (process.env.SEED_DEMO_DATA === 'true') {
+    console.log('SEED_DEMO_DATA=true: seeding demo users...');
+    await seed();
+  }
 
   app.listen(PORT, () => {
     console.log(`\n🚀 IssueTrack CRM API running on port ${PORT}`);

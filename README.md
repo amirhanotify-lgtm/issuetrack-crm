@@ -141,12 +141,22 @@ npm start
 | Agent      | aisha@company.com      | password123 |
 | Agent      | tom@company.com        | password123 |
 
-Use these credentials after the database has been seeded. If the tables are empty, run the release command or the migration/seed script first:
+Use these credentials after the database has been seeded. If the tables are empty, run the release command or the demo seed script first:
 
 ```bash
 cd backend
-npm run db:reset
+npm run release:seed
 ```
+
+For the frontend, make sure `REACT_APP_API_URL` points to your live Railway backend URL (for example `https://your-backend.up.railway.app/api`), not the old Render URL.
+
+If you want demo users seeded automatically on the deployed backend, set this Railway variable:
+
+```bash
+SEED_DEMO_DATA=true
+```
+
+Then redeploy. The app will run the demo seed once on startup.
 
 ---
 
